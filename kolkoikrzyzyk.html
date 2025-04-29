@@ -16,17 +16,30 @@
       font-family: Arial, sans-serif;
       color: white;
     }
-    h1 {
-      margin: 20px;
-      font-size: 36px;
+    header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #222;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
       color: red;
+    }
+    header a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
     }
     #board {
       display: grid;
       grid-template-columns: repeat(3, 100px);
       grid-template-rows: repeat(3, 100px);
       gap: 10px;
-      margin-top: 20px;
+      margin-top: 30px;
     }
     .cell {
       width: 100px;
@@ -57,7 +70,10 @@
 </head>
 <body>
 
-<h1>Kółko i Krzyżyk</h1>
+<header>
+  <h1>Kółko i Krzyżyk</h1>
+  <a href="index.html">&larr; Powrót do Węża</a>
+</header>
 
 <div id="board"></div>
 
@@ -127,4 +143,3 @@
 
 </body>
 </html>
-
