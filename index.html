@@ -57,6 +57,15 @@
       margin-top: 20px;
       font-size: 18px;
     }
+    /* Migotanie czaszki */
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+    .skull {
+      animation: blink 1s infinite;
+    }
   </style>
 </head>
 <body>
@@ -66,7 +75,7 @@
 </header>
 
 <div id="gameContainer">
-  <canvas id="gameCanvas" width="450" height="450"></canvas>
+  <canvas id="gameCanvas" width="300" height="300"></canvas>
 </div>
 
 <button id="resetBtn" onclick="resetGame()">Resetuj grę</button>
@@ -75,16 +84,16 @@
 
 <a href="kolkoikrzyzyk.html">Zagraj w Kółko i Krzyżyk</a>
 
-<audio id="eatSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<audio id="eatSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
 <script>
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   const eatSound = document.getElementById('eatSound');
   const box = 30;
-  const canvasSize = 450;
+  const canvasSize = 300;
   let snake = [];
-  snake[0] = {x: 7 * box, y: 7 * box};
+  snake[0] = {x: 5 * box, y: 5 * box};
   let direction = null;
   let skull = generateSkull();
   let score = 0;
@@ -124,9 +133,8 @@
       ctx.strokeRect(snake[i].x, snake[i].y, box, box);
     }
 
-    ctx.beginPath();
+    ctx.font = "26px Arial";
     ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
     ctx.fillText("☠️", skull.x + 5, skull.y + 25);
 
     let snakeX = snake[0].x;
@@ -146,10 +154,7 @@
       snake.pop();
     }
 
-    let newHead = {
-      x: snakeX,
-      y: snakeY
-    };
+    let newHead = { x: snakeX, y: snakeY };
 
     if (snakeX < 0 || snakeX >= canvasSize || snakeY < 0 || snakeY >= canvasSize || collision(newHead, snake)) {
       clearInterval(game);
@@ -175,12 +180,12 @@
   function resetGame() {
     clearInterval(game);
     snake = [];
-    snake[0] = {x: 7 * box, y: 7 * box};
+    snake[0] = {x: 5 * box, y: 5 * box};
     direction = null;
     skull = generateSkull();
     score = 0;
     document.getElementById('scoreBoard').innerText = `Wynik: 0 | Rekord: ${highScore}`;
-    game = setInterval(draw, 200); // zmniejszona prędkość (wolniejsza gra)
+    game = setInterval(draw, 150); // prędkość ruchu (wolniejsza)
   }
 
   resetGame();
