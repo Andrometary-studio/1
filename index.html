@@ -68,22 +68,28 @@
 <button id="resetBtn" onclick="resetGame()">Resetuj</button>
 <div id="record">Najlepszy wynik: 0</div>
 
-<audio id="eatSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+<audio id="eatSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
 <script>
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   const box = 20;
   const canvasSize = 400;
-  let snake = [{x: 160, y: 200}];
-  let direction = "RIGHT";
-  let skull = randomPosition();
-  let score = 0;
+  let snake;
+  let direction;
+  let skull;
+  let score;
   let highScore = 0;
-
   const eatSound = document.getElementById('eatSound');
 
   document.addEventListener('keydown', directionControl);
+
+  function initGame() {
+    snake = [{x: 160, y: 200}];
+    direction = "RIGHT";
+    skull = randomPosition();
+    score = 0;
+  }
 
   function directionControl(event) {
     if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
@@ -130,6 +136,7 @@
 
     if (snakeX === skull.x && snakeY === skull.y) {
       score++;
+      eatSound.currentTime = 0;
       eatSound.play();
       if (score > highScore) {
         highScore = score;
@@ -160,12 +167,10 @@
   }
 
   function resetGame() {
-    snake = [{x: 160, y: 200}];
-    direction = "RIGHT";
-    score = 0;
-    skull = randomPosition();
+    initGame();
   }
 
+  initGame();
   setInterval(draw, 200);
 </script>
 
