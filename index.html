@@ -2,187 +2,171 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Wąż zbiera czaszki</title>
+  <title>Wąż - Gra</title>
   <style>
     body {
-      background-color: #111;
+      background-color: #000;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       height: 100vh;
-      margin: 0;
+      overflow: hidden;
       font-family: Arial, sans-serif;
       color: white;
-      padding-top: 30px;
     }
     h1 {
-      font-size: 32px;
-      margin-bottom: 20px;
       align-self: flex-start;
-      margin-left: 30px;
+      margin: 20px;
+      font-size: 36px;
+    }
+    a {
+      align-self: flex-start;
+      margin-left: 20px;
+      margin-bottom: 20px;
+      font-size: 20px;
+      color: cyan;
+      text-decoration: underline;
+    }
+    #gameContainer {
+      position: relative;
+      background-color: #222;
+      margin-top: 10px;
     }
     canvas {
-      background-color: #222;
-      border: 5px solid #fff;
-      box-shadow: 0 0 20px lime;
+      background-color: #111;
+      display: block;
+      margin: 0 auto;
     }
-    #message, #score, #highscore {
-      margin-top: 20px;
-      font-size: 24px;
-    }
-    #restart {
-      margin-top: 15px;
+    #resetBtn {
+      margin-top: 10px;
       padding: 10px 20px;
-      font-size: 18px;
-      background: #fff;
-      color: #222;
+      background-color: green;
+      color: white;
       border: none;
+      font-size: 18px;
       cursor: pointer;
       border-radius: 10px;
+    }
+    #record {
+      margin-top: 10px;
+      font-size: 20px;
     }
   </style>
 </head>
 <body>
 
-<h1>Kółko i Krzyżyk SOON</h1>
+<h1>Kółko i Krzyżyk</h1>
+<a href="kolkoikrzyzyk.html">Zagraj w Kółko i Krzyżyk</a>
 
-<canvas id="game" width="600" height="600"></canvas>
+<div id="gameContainer">
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+</div>
 
-<div id="score">Wynik: 0</div>
-<div id="highscore">Rekord: 0</div>
-<div id="message"></div>
-<button id="restart" onclick="restartGame()">Restart</button>
+<button id="resetBtn" onclick="resetGame()">Resetuj</button>
+<div id="record">Najlepszy wynik: 0</div>
 
-<!-- Dźwięk -->
-<audio id="eatSound">
-  <source src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" type="audio/ogg">
-  Twój przeglądarka nie obsługuje audio.
-</audio>
+<audio id="eatSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 
 <script>
-  const canvas = document.getElementById('game');
+  const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
-  const box = 30;
-  let snake = [{x: 10 * box, y: 10 * box}];
-  let skull = spawnSkull();
-  let direction = '';
+  const box = 20;
+  const canvasSize = 400;
+  let snake = [{x: 160, y: 200}];
+  let direction = "RIGHT";
+  let skull = randomPosition();
   let score = 0;
-  let highscore = 0;
-  let gameInterval;
-  let blink = true;
+  let highScore = 0;
+
   const eatSound = document.getElementById('eatSound');
 
-  document.addEventListener('keydown', dir);
+  document.addEventListener('keydown', directionControl);
 
-  function dir(event) {
-    if (event.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
-    else if (event.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
-    else if (event.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
-    else if (event.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+  function directionControl(event) {
+    if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+    else if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+    else if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+    else if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
   }
 
-  function spawnSkull() {
-    const min = 1;
-    const max = (canvas.width / box) - 2;
-    return {
-      x: Math.floor(Math.random() * (max - min + 1) + min) * box,
-      y: Math.floor(Math.random() * (max - min + 1) + min) * box
-    };
-  }
-
-  function drawRoundedRect(x, y, width, height, radius, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.fill();
+  function randomPosition() {
+    let pos;
+    do {
+      pos = {
+        x: Math.floor(Math.random() * (canvasSize/box - 2) + 1) * box,
+        y: Math.floor(Math.random() * (canvasSize/box - 2) + 1) * box
+      };
+    } while (pos.x <= 0 || pos.x >= canvasSize - box || pos.y <= 0 || pos.y >= canvasSize - box);
+    return pos;
   }
 
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#111";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // rysowanie kreskówkowego węża
+    // Snake
     for (let i = 0; i < snake.length; i++) {
-      const color = (i === 0) ? '#00FF00' : '#66FF66';
-      drawRoundedRect(snake[i].x, snake[i].y, box, box, 10, color);
+      ctx.fillStyle = (i === 0) ? "lime" : "lightgreen";
+      ctx.fillRect(snake[i].x, snake[i].y, box, box);
+      ctx.strokeStyle = "darkgreen";
+      ctx.strokeRect(snake[i].x, snake[i].y, box, box);
     }
 
-    // rysowanie czaszki (migająca)
-    if (blink) {
-      ctx.fillStyle = 'white';
-      ctx.font = "50px Arial";
-      ctx.fillText("☠", skull.x - 10, skull.y + 40);
-    }
+    // Skull (flashing effect)
+    ctx.fillStyle = Math.random() > 0.5 ? "white" : "red";
+    ctx.font = "24px Arial";
+    ctx.fillText("☠", skull.x + 2, skull.y + 24);
 
     let snakeX = snake[0].x;
     let snakeY = snake[0].y;
 
-    if (direction === 'LEFT') snakeX -= box;
-    if (direction === 'UP') snakeY -= box;
-    if (direction === 'RIGHT') snakeX += box;
-    if (direction === 'DOWN') snakeY += box;
-
-    // kolizja ze ścianą
-    if (snakeX < 0 || snakeY < 0 || snakeX >= canvas.width || snakeY >= canvas.height) {
-      gameOver();
-      return;
-    }
-
-    // kolizja z samym sobą
-    for (let i = 1; i < snake.length; i++) {
-      if (snakeX === snake[i].x && snakeY === snake[i].y) {
-        gameOver();
-        return;
-      }
-    }
+    if (direction === "LEFT") snakeX -= box;
+    if (direction === "UP") snakeY -= box;
+    if (direction === "RIGHT") snakeX += box;
+    if (direction === "DOWN") snakeY += box;
 
     if (snakeX === skull.x && snakeY === skull.y) {
       score++;
-      document.getElementById('score').innerText = "Wynik: " + score;
-      if (score > highscore) {
-        highscore = score;
-        document.getElementById('highscore').innerText = "Rekord: " + highscore;
-      }
       eatSound.play();
-      skull = spawnSkull();
+      if (score > highScore) {
+        highScore = score;
+        document.getElementById('record').innerText = "Najlepszy wynik: " + highScore;
+      }
+      skull = randomPosition();
     } else {
       snake.pop();
     }
 
-    let newHead = {x: snakeX, y: snakeY};
+    const newHead = {x: snakeX, y: snakeY};
+
+    if (snakeX < 0 || snakeX >= canvasSize || snakeY < 0 || snakeY >= canvasSize || collision(newHead, snake)) {
+      resetGame();
+      return;
+    }
+
     snake.unshift(newHead);
   }
 
-  function gameOver() {
-    clearInterval(gameInterval);
-    document.getElementById('message').innerText = "Przegrałeś!";
+  function collision(head, array) {
+    for (let i = 0; i < array.length; i++) {
+      if (head.x === array[i].x && head.y === array[i].y) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  function restartGame() {
-    snake = [{x: 10 * box, y: 10 * box}];
-    direction = '';
+  function resetGame() {
+    snake = [{x: 160, y: 200}];
+    direction = "RIGHT";
     score = 0;
-    document.getElementById('score').innerText = "Wynik: 0";
-    document.getElementById('message').innerText = '';
-    skull = spawnSkull();
-    clearInterval(gameInterval);
-    gameInterval = setInterval(draw, 150); // wolniejsze tempo
+    skull = randomPosition();
   }
 
-  gameInterval = setInterval(draw, 150); // WOLNIEJSZA gra
-
-  // migotanie czaszki
-  setInterval(() => {
-    blink = !blink;
-  }, 400);
+  setInterval(draw, 200);
 </script>
 
 </body>
