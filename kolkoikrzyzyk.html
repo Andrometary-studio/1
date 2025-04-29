@@ -1,1 +1,130 @@
-<a href="kolkoikrzyzyk.html">Zagraj w Kółko i Krzyżyk</a>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Kółko i Krzyżyk</title>
+  <style>
+    body {
+      background-color: #111;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    h1 {
+      margin: 20px;
+      font-size: 36px;
+      color: red;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+    .cell:hover {
+      background-color: #555;
+    }
+    #resetBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: darkred;
+      color: white;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Kółko i Krzyżyk</h1>
+
+<div id="board"></div>
+
+<button id="resetBtn" onclick="resetGame()">Resetuj</button>
+
+<audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+<script>
+  const board = document.getElementById('board');
+  const winSound = document.getElementById('winSound');
+  let cells = [];
+  let currentPlayer = 'X';
+  let gameOver = false;
+
+  function createBoard() {
+    board.innerHTML = '';
+    cells = [];
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.addEventListener('click', () => handleMove(cell, i));
+      board.appendChild(cell);
+      cells.push('');
+    }
+  }
+
+  function handleMove(cell, index) {
+    if (cells[index] !== '' || gameOver) return;
+    cells[index] = currentPlayer;
+    cell.textContent = currentPlayer;
+    if (checkWin()) {
+      gameOver = true;
+      setTimeout(() => {
+        alert(currentPlayer + " wygrywa!");
+        winSound.currentTime = 0;
+        winSound.play();
+      }, 100);
+    } else if (cells.every(c => c !== '')) {
+      gameOver = true;
+      setTimeout(() => {
+        alert("Remis!");
+      }, 100);
+    } else {
+      currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
+    }
+  }
+
+  function checkWin() {
+    const winPatterns = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+    return winPatterns.some(pattern => {
+      return pattern.every(i => cells[i] === currentPlayer);
+    });
+  }
+
+  function resetGame() {
+    currentPlayer = 'X';
+    gameOver = false;
+    createBoard();
+  }
+
+  createBoard();
+</script>
+
+</body>
+</html>
+
